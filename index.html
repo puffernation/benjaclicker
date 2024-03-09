@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>benja clicker game</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #f0f0f0;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            font-size: 3rem;
+            color: #2196f3;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        #pufferfish {
+            width: 250px;
+            height: 250px;
+            background-image: url("./chinese-kid-dance.gif");
+            background-size: cover;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            border-radius: 50%;
+        }
+
+        #pufferfish:hover {
+            transform: scale(1.1);
+        }
+
+        #score {
+            font-size: 2rem;
+            color: #fff;
+            background-color: #2196f3;
+            padding: 10px 20px;
+            margin-top: 30px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            animation: score-increase 0.5s ease;
+        }
+
+        .upgradeButton {
+            font-size: 1.5rem;
+            padding: 15px 30px;
+            margin-top: 20px;
+            border-radius: 5px;
+            background-color: #2196f3;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .upgradeButton:hover {
+            background-color: #1976d2;
+        }
+
+        .upgradeButton:active {
+            transform: scale(0.95);
+        }
+
+        .upgradeButton.disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        @keyframes score-increase {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>benja clicker</h1>
+    <div id="pufferfish" onclick="clickHandler()" style="border-radius: 50%; border: black 1px solid;"></div>
+    <div id="score" style="font-size: 24px; color: white; background-color: black; padding: 10px; margin-top: 3rem;">
+        Score: 0</div>
+    <button onclick="upgradeHandler()" id="upgradeButton" class="upgradeButton disabled" disabled>Upgrade</button>
+    <button onclick="secondUpgradeHandler()" id="secondUpgradeButton" class="upgradeButton disabled" disabled>Second
+        Upgrade</button>
+    <button onclick="autoClickerHandler()" id="autoClickerButton" class="upgradeButton disabled" disabled>Auto Clicker</button>
+    <audio src="./Sleepwalker x Icewhore SLOWED ( BEST PART ).mp3"></audio>
+    <script>
+        let score = 0;
+        let upgradeCost = 100;
+        let pointsPerClick = 1;
+        let secondUpgradeCost = 10000;
+        let pointsPerSecondUpgrade = 2;
+        let autoClickerCost = 500;
+        let autoClickerInterval;
+
+        function clickHandler() {
+            if (score < 0) {
+                return;
+            }
+            score += pointsPerClick;
+            document.getElementById('score').textContent = `Score: ${score}`;
+            saveGame();
+            enableUpgradeButton();
+            enableSecondUpgradeButton();
+            enableAutoClickerButton();
+            playPufferfishSound();
+        }
+
+        function upgradeHandler() {
+            if (score >= upgradeCost) {
+                score -= upgradeCost;
+                pointsPerClick++;
+                upgradeCost += 50;
+                document.getElementById('score').textContent = `Score: ${score}`;
+                document.getElementById('upgradeButton').textContent = `Upgrade (${upgradeCost} points)`;
+                saveGame();
+            }
+            enableUpgradeButton();
+        }
+
+        function secondUpgradeHandler() {
+            if (score >= secondUpgradeCost) {
+                score -= secondUpgradeCost;
+                pointsPerSecondUpgrade += 5;
+                secondUpgradeCost += 100;
+                document.getElementById('score').textContent = `Score: ${score}`;
+                document.getElementById('secondUpgradeButton').textContent = `Second Upgrade (${secondUpgradeCost} points)`;
+                saveGame();
+            }
+            enableSecondUpgradeButton();
+        }
+
+        function autoClickerHandler() {
+            if (score >= autoClickerCost) {
+                score -= autoClickerCost;
+                document.getElementById('score').textContent = `Score: ${score}`;
+                document.getElementById('autoClickerButton').textContent = `Auto Clicker (${autoClickerCost} points)`;
+                startAutoClicker();
+                saveGame();
+            }
+            enableAutoClickerButton();
+        }
+
+        function startAutoClicker() {
+            if (autoClickerInterval) {
+                clearInterval(autoClickerInterval);
+            }
+            autoClickerInterval = setInterval(clickHandler, 1000);
+        }
+
+        function stopAutoClicker() {
+            clearInterval(autoClickerInterval);
+        }
+
+        function enableUpgradeButton() {
+            const upgradeButton = document.getElementById('upgradeButton');
+            if (score >= upgradeCost) {
+                upgradeButton.classList.remove('disabled');
+                upgradeButton.disabled = false;
+            } else {
+                upgradeButton.classList.add('disabled');
+                upgradeButton.disabled = true;
+            }
+        }
+
+        function enableSecondUpgradeButton() {
+            const secondUpgradeButton = document.getElementById('secondUpgradeButton');
+            if (score >= secondUpgradeCost) {
+                secondUpgradeButton.classList.remove('disabled');
+                secondUpgradeButton.disabled = false;
+            } else {
+                secondUpgradeButton.classList.add('disabled');
+                secondUpgradeButton.disabled = true;
+            }
+        }
+
+        function enableAutoClickerButton() {
+            const autoClickerButton = document.getElementById('autoClickerButton');
+            if (score >= autoClickerCost) {
+                autoClickerButton.classList.remove('disabled');
+                autoClickerButton.disabled = false;
+            } else {
+                autoClickerButton.classList.add('disabled');
+                autoClickerButton.disabled = true;
+            }
+        }
+
+        function playPufferfishSound() {
+            const pufferfishSound = document.getElementById('pufferfishSound');
+            pufferfishSound.play().catch(error => {
+                console.error("Error playing pufferfish sound:", error.message);
+            });
+        }
+
+        document.body.addEventListener('click', () => {
+            const backgroundMusic = document.getElementById('backgroundMusic');
+            backgroundMusic.play().catch(error => {
+                console.error("Error playing background music:", error.message);
+            });
+        });
+
+        function saveGame() {
+            localStorage.setItem('score', score);
+            localStorage.setItem('pointsPerClick', pointsPerClick);
+            localStorage.setItem('upgradeCost', upgradeCost);
+            localStorage.setItem('pointsPerSecondUpgrade', pointsPerSecondUpgrade);
+            localStorage.setItem('secondUpgradeCost', secondUpgradeCost);
+            localStorage.setItem('autoClickerCost', autoClickerCost);
+        }
+
+        function loadGame() {
+            score = parseInt(localStorage.getItem('score')) || 0;
+            pointsPerClick = parseInt(localStorage.getItem('pointsPerClick')) || 1;
+            upgradeCost = parseInt(localStorage.getItem('upgradeCost')) || 100;
+            pointsPerSecondUpgrade = parseInt(localStorage.getItem('pointsPerSecondUpgrade')) || 2;
+            secondUpgradeCost = parseInt(localStorage.getItem('secondUpgradeCost')) || 10000;
+            autoClickerCost = parseInt(localStorage.getItem('autoClickerCost')) || 500;
+
+            document.getElementById('score').textContent = `Score: ${score}`;
+            document.getElementById('upgradeButton').textContent = `Upgrade (${upgradeCost} points)`;
+            document.getElementById('secondUpgradeButton').textContent = `Second Upgrade (${secondUpgradeCost} points)`;
+            document.getElementById('autoClickerButton').textContent = `Auto Clicker (${autoClickerCost} points)`;
+
+            enableUpgradeButton();
+            enableSecondUpgradeButton();
+            enableAutoClickerButton();
+        }
+
+        loadGame();
+    </script>
+</body>
+
+</html>
